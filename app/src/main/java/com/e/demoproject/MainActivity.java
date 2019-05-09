@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     TextInputEditText txtName;
     Button btnSubmit;
-    Chip chipWhite, chipPink, chipYellow, chipBlue, chipGreen, chipRed;
+    Chip chipCycling, chipCooking, chipLearning, chipPainting, chipDrawing, chipDance, chipCamping, chipHiking, chipPhotography, chipChess;
     ArrayList<String> strings;
     private RadioGroup radioGroup;
     String mGender;
@@ -93,31 +93,64 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         call_permissions();
-        chipGroup = findViewById(R.id.chipGroup);
-        txtName = findViewById(R.id.txtName);
-        btnSubmit = findViewById(R.id.btnSubmit);
-        chipWhite = findViewById(R.id.chipWhite);
-        chipPink = findViewById(R.id.chipPink);
-        chipYellow = findViewById(R.id.chipYellow);
-        chipBlue = findViewById(R.id.chipBlue);
-        chipGreen = findViewById(R.id.chipGreen);
-        chipRed = findViewById(R.id.chipRed);
+        initialization();
 
-
-        profile_image = findViewById(R.id.profile_image);
-        imageSelectImages = findViewById(R.id.imageSelectImages);
-
-
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-        imageSelectImages.setOnClickListener(new View.OnClickListener() {
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                StrictMode.setVmPolicy(builder.build());
-                selectImage();
+                if (!imagesFlag) {
+                    Toast.makeText(MainActivity.this, "Please select image", Toast.LENGTH_SHORT).show();
+                } else if ( txtName.getText().toString().isEmpty() || txtName.getText().toString().equals("null")) {
+                    Toast.makeText(MainActivity.this, "Please Enter Name", Toast.LENGTH_SHORT).show();
+                }else if (mGender == null || mGender.isEmpty() || mGender.equals("null")) {
+                    Toast.makeText(MainActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
+                }else if (materialBetterSpinner.getText().toString().isEmpty() || materialBetterSpinner.getText().toString().equals("null")) {
+                    Toast.makeText(MainActivity.this, "Please Select Designation", Toast.LENGTH_SHORT).show();
+                } else if (strings == null || strings.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please Select Hobby", Toast.LENGTH_SHORT).show();
+                }  else {
+                    Log.e(TAG, "Spinner item: " + materialBetterSpinner.getText().toString());
+                    Log.e(TAG, "hobby: " + strings);
+                    Log.e(TAG, "Name: " + txtName.getText().toString());
+                    Log.e(TAG, "Gender: " + mGender);
+                    createNote(txtName.getText().toString(), mGender, materialBetterSpinner.getText().toString(), strings.toString(), imageEncoded);
+                    Intent intent = new Intent(MainActivity.this, ViewActivity.class);
+                    startActivity(intent);
+                }
 
             }
         });
+
+
+        db = new DatabaseHelper(this);
+
+    }
+
+    private void initialization() {
+        txtName = findViewById(R.id.txtName);
+        profile_image = findViewById(R.id.profile_image);
+        imageSelectImages = findViewById(R.id.imageSelectImages);
+        radioGroup = findViewById(R.id.radioGroup);
+        chipDance = findViewById(R.id.chipDance);
+        chipDrawing = findViewById(R.id.chipDrawing);
+        chipPainting = findViewById(R.id.chipPainting);
+        chipLearning = findViewById(R.id.chipLearning);
+        chipCooking = findViewById(R.id.chipCooking);
+        chipCycling = findViewById(R.id.chipCycling);
+        chipCamping = findViewById(R.id.chipCamping);
+        chipHiking = findViewById(R.id.chipHiking);
+        chipPhotography = findViewById(R.id.chipPhotography);
+        chipChess = findViewById(R.id.chipChess);
+        btnSubmit = findViewById(R.id.btnSubmit);
+        chipGroup = findViewById(R.id.chipGroup);
+        setDesignation();
+        hobbySelecation();
+        selectProfileImage();
+        selectGander();
+    }
+
+    private void selectGander() {
+
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @SuppressLint("ResourceType")
             @Override
@@ -130,14 +163,31 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void selectProfileImage() {
+        imageSelectImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                StrictMode.setVmPolicy(builder.build());
+                selectImage();
+
+            }
+        });
+    }
+
+    private void setDesignation() {
         strings = new ArrayList<>();
         materialBetterSpinner = findViewById(R.id.material_spinner1);
         Log.e(TAG, "onCreate: ");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_dropdown_item_1line, SPINNER_DATA);
         materialBetterSpinner.setAdapter(adapter);
+    }
 
-        chipWhite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+    private void hobbySelecation() {
+        chipDance.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -149,67 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onCheckedChanged: " + strings.toString());
             }
         });
-        chipPink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
-                    strings.add(buttonView.getText().toString());
-                } else {
-                    strings.remove(buttonView.getText().toString());
-                }
-                Log.e(TAG, "onCheckedChanged: " + strings.toString());
-            }
-        });
-        chipYellow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
-                    strings.add(buttonView.getText().toString());
-                } else {
-                    strings.remove(buttonView.getText().toString());
-                }
-                Log.e(TAG, "onCheckedChanged: " + strings.toString());
-            }
-        });
-        chipBlue.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
-                    strings.add(buttonView.getText().toString());
-                } else {
-                    strings.remove(buttonView.getText().toString());
-                }
-                Log.e(TAG, "onCheckedChanged: " + strings.toString());
-            }
-        });
-        chipPink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
-                    strings.add(buttonView.getText().toString());
-                } else {
-                    strings.remove(buttonView.getText().toString());
-                }
-                Log.e(TAG, "onCheckedChanged: " + strings.toString());
-            }
-        });
-        chipRed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
-                    strings.add(buttonView.getText().toString());
-                } else {
-                    strings.remove(buttonView.getText().toString());
-                }
-                Log.e(TAG, "onCheckedChanged: " + strings.toString());
-            }
-        });
-        chipGreen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        chipDrawing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -222,26 +212,102 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
+        chipPainting.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if(imagesFlag){
-
-                }else {
-                    Toast.makeText(MainActivity.this, "Please Select Images", Toast.LENGTH_SHORT).show();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
                 }
-                Log.e(TAG, "Spinner item: " + materialBetterSpinner.getText().toString());
-                Log.e(TAG, "hobby: " + strings);
-                Log.e(TAG, "Name: " + txtName.getText().toString());
-                Log.e(TAG, "Gender: " + mGender);
-                createNote(txtName.getText().toString(), mGender, materialBetterSpinner.getText().toString(), strings.toString(), imageEncoded);
-                Intent intent = new Intent(MainActivity.this, ViewActivity.class);
-                startActivity(intent);
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
             }
         });
-
-
-        db = new DatabaseHelper(this);
+        chipLearning.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
+        chipCooking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
+        chipCycling.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
+        chipCamping.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
+        chipHiking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
+        chipPhotography.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
+        chipChess.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Log.e(TAG, "onCheckedChanged: " + isChecked + "--->" + buttonView.getText().toString());
+                    strings.add(buttonView.getText().toString());
+                } else {
+                    strings.remove(buttonView.getText().toString());
+                }
+                Log.e(TAG, "onCheckedChanged: " + strings.toString());
+            }
+        });
 
     }
 

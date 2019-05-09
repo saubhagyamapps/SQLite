@@ -19,7 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
 
     private Context context;
-    private List<UserModel> notesList;
+    private List<UserModel> userList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView txtName, txtGender, txtPost, txtHobby;
@@ -36,9 +36,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
     }
 
 
-    public UserAdapter(Context context, List<UserModel> notesList) {
+    public UserAdapter(Context context, List<UserModel> userList) {
         this.context = context;
-        this.notesList = notesList;
+        this.userList = userList;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        UserModel userModel = notesList.get(position);
+        UserModel userModel = userList.get(position);
         holder.txtName.setText(userModel.getName());
         holder.txtGender.setText(userModel.getGender());
         holder.txtHobby.setText(userModel.getHobby());
@@ -61,8 +61,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
 
     @Override
     public int getItemCount() {
-        return notesList.size();
+        return userList.size();
     }
+
     public static Bitmap decodeBase64(String input) {
         byte[] decodedByte = Base64.decode(input, 0);
         return BitmapFactory

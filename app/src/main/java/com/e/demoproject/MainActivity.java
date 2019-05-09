@@ -72,58 +72,13 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA};
 
-    private void call_permissions() {
-        int result;
-        List<String> listPermissionsNeeded = new ArrayList<>();
-        for (String p : permissions) {
-            result = ContextCompat.checkSelfPermission(getApplicationContext(), p);
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                listPermissionsNeeded.add(p);
-            }
-        }
-        if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray
-                    (new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
-        }
-        return;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db = new DatabaseHelper(this);
         call_permissions();
         initialization();
-
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!imagesFlag) {
-                    Toast.makeText(MainActivity.this, "Please select image", Toast.LENGTH_SHORT).show();
-                } else if ( txtName.getText().toString().isEmpty() || txtName.getText().toString().equals("null")) {
-                    Toast.makeText(MainActivity.this, "Please Enter Name", Toast.LENGTH_SHORT).show();
-                }else if (mGender == null || mGender.isEmpty() || mGender.equals("null")) {
-                    Toast.makeText(MainActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-                }else if (materialBetterSpinner.getText().toString().isEmpty() || materialBetterSpinner.getText().toString().equals("null")) {
-                    Toast.makeText(MainActivity.this, "Please Select Designation", Toast.LENGTH_SHORT).show();
-                } else if (strings == null || strings.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Please Select Hobby", Toast.LENGTH_SHORT).show();
-                }  else {
-                    Log.e(TAG, "Spinner item: " + materialBetterSpinner.getText().toString());
-                    Log.e(TAG, "hobby: " + strings);
-                    Log.e(TAG, "Name: " + txtName.getText().toString());
-                    Log.e(TAG, "Gender: " + mGender);
-                    createNote(txtName.getText().toString(), mGender, materialBetterSpinner.getText().toString(), strings.toString(), imageEncoded);
-                    Intent intent = new Intent(MainActivity.this, ViewActivity.class);
-                    startActivity(intent);
-                }
-
-            }
-        });
-
-
-        db = new DatabaseHelper(this);
-
     }
 
     private void initialization() {
@@ -147,6 +102,53 @@ public class MainActivity extends AppCompatActivity {
         hobbySelecation();
         selectProfileImage();
         selectGander();
+        saveData();
+    }
+
+    private void call_permissions() {
+        int result;
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : permissions) {
+            result = ContextCompat.checkSelfPermission(getApplicationContext(), p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray
+                    (new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
+        }
+        return;
+    }
+
+    private void saveData() {
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!imagesFlag) {
+                    Toast.makeText(MainActivity.this, "Please select image", Toast.LENGTH_SHORT).show();
+                } else if (txtName.getText().toString().isEmpty() || txtName.getText().toString().equals("null")) {
+                    Toast.makeText(MainActivity.this, "Please Enter Name", Toast.LENGTH_SHORT).show();
+                } else if (mGender == null || mGender.isEmpty() || mGender.equals("null")) {
+                    Toast.makeText(MainActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
+                } else if (materialBetterSpinner.getText().toString().isEmpty() || materialBetterSpinner.getText().toString().equals("null")) {
+                    Toast.makeText(MainActivity.this, "Please Select Designation", Toast.LENGTH_SHORT).show();
+                } else if (strings == null || strings.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please Select Hobby", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e(TAG, "Spinner item: " + materialBetterSpinner.getText().toString());
+                    Log.e(TAG, "hobby: " + strings);
+                    Log.e(TAG, "Name: " + txtName.getText().toString());
+                    Log.e(TAG, "Gender: " + mGender);
+                    createNote(txtName.getText().toString(), mGender, materialBetterSpinner.getText().toString(), strings.toString(), imageEncoded);
+                    Intent intent = new Intent(MainActivity.this, ViewActivity.class);
+                    startActivity(intent);
+                }
+
+            }
+        });
+
+
     }
 
     private void selectGander() {

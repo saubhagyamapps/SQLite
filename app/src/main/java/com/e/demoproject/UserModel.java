@@ -1,7 +1,5 @@
 package com.e.demoproject;
 
-import java.sql.Blob;
-
 public class UserModel {
     public static final String TABLE_NAME = "notes";
 
